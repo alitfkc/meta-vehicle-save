@@ -1,0 +1,21 @@
+<meta>
+	<info author="Meta Scripts -Beyonder" type="script" name="Login Panel" version="1.0" />
+        <!-- settings -->
+	<script src="settings.lua" type="shared" cache = "false" />
+
+        <!-- GUI -->
+        <script src="gui/lib.lua" type="client" cache = "false" />
+	<script src="gui/gui.lua" type="client" cache = "false" />
+
+                <!-- Client -->
+        <script src="client/util_c.lua" type="client" cache = "false" />
+
+            <!-- server -->
+        <script src="server/db.lua" type="server" cache = "false" />
+        <script src="server/util_s.lua" type="server" cache = "false" />
+
+
+
+
+
+</meta>
