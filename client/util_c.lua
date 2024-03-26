@@ -105,7 +105,7 @@ addEventHandler("onClientResourceStart",resourceRoot,function()
     }
     
     --we add bindkey for panel 
-
+    bindKey(key,"down",on_off)
 
     for k,v in pairs(gui) do
         if v.language_row and functions_client[v.language_row] then 
