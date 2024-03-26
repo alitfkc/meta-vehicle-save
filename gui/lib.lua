@@ -1,44 +1,23 @@
-
-
 genelGuiTablo = {}
 
 --guiCreateWindow
-local wtablo = {}
+wtablo = {}
 --guiCreateButton
-local btablo = {}
---guiCreateMemo
-local mtablo = {}
-
+btablo = {}
 --guiCreateGridList
 Ltablo = {}
+--guiCreateMemo
+mtablo = {}
+--guiCreateEdit
+etablo = {}
+--guiguiCreateScrollBar
+sbtablo = {}
 
-font1 = "default-bold"
---font2 = guiCreateFont("dosyalar/Font2.otf",10)
-font2 = "default-bold"
-
-_guiCreateWindow = guiCreateWindow
-_guiCreateButton = guiCreateButton
-_guiCreateEdit = guiCreateEdit
-_guiCreateMemo = guiCreateMemo
-
-_guiGetPosition = guiGetPosition
-_guiSetPosition = guiSetPosition
-_guiGetSize = guiGetSize
-_guiSetSize = guiSetSize
-_guiSetText = guiSetText
-_guiGetText = guiGetText
-_guiSetEnabled = guiSetEnabled
-_guiSetVisible = guiSetVisible
-_destroyElement = destroyElement
-_guiWindowSetSizable = guiWindowSetSizable
-
-
-function resimOlustur(isim,a)
+function resimOlustur(isim)
 	if fileExists(isim.."png") then return isim.."png" end
 	local texture = dxCreateTexture(1,1) 
 	local pixels = dxGetTexturePixels(texture) 
-	local a = a or 255
-	local r,g,b = 255,255,255
+	local r,g,b,a = 255,255,255,255 
 	dxSetPixelColor(pixels,0,0,r,g,b,a) 
 	dxSetTexturePixels(texture, pixels) 
 	local pxl = dxConvertPixels(dxGetTexturePixels(texture),"png") 
@@ -47,25 +26,26 @@ function resimOlustur(isim,a)
 	fileClose(nImg)
 	return isim..".png" 
 end
+
 function renkVer(resim,hex)
 	guiSetProperty(resim,"ImageColours","tl:FF"..hex.." tr:FF"..hex.." bl:FF"..hex.." br:FF"..hex)
 end
 
 _guiCreateWindow = guiCreateWindow
-function guiCreateWindow(x,y,g,u,yazi,relative,parent,renk1,renk2,renk3,renk4,kapat)
+function guiCreateWindow(x,y,g,u,yazi,relative,parent,renk1,renk2,renk3,renk4)
 	wsayi = #wtablo +1
 	
 	if not renk1 or string.len(renk1) > 6 then
 		renk1 =  "000000" -- window renk üst taraf
 	end
 	if not renk2 or string.len(renk2) > 6 then
-		renk2 = "000000" -- window renk alt taraf
+		renk2 = "000000" -- panel adı kısmı
 	end
 	if not renk3 or string.len(renk3) > 6 then
-		renk3 = "000000" -- baslik renk
+		renk3 = "000000" -- window renk alt taraf
 	end
 	if not renk4 or string.len(renk4) > 6 then
-		renk4 = "000000"  -- window kenar çizgi
+		renk4 = "000000"  -- window cerceve renk
 	end
 	
 	if relative  then
@@ -76,12 +56,13 @@ function guiCreateWindow(x,y,g,u,yazi,relative,parent,renk1,renk2,renk3,renk4,ka
 	
 	if not wtablo[wsayi] then wtablo[wsayi] = {} end
 	--arkaResim
-	wtablo[wsayi].resim = guiCreateStaticImage(x,y,g,u,resimOlustur("test",120),relative,parent)
+	wtablo[wsayi].resim = guiCreateStaticImage(x,y,g,u,resimOlustur("test"),relative,parent)
 	renkVer(wtablo[wsayi].resim,renk1)
-	guiSetProperty(wtablo[wsayi].resim,"ImageColours","tl:FF"..renk1.." tr:FF"..renk1.." bl:FF"..renk2.." br:FF"..renk2.."")
+	guiSetProperty(wtablo[wsayi].resim,"ImageColours","tl:FF"..renk1.." tr:FF"..renk1.." bl:FF"..renk3.." br:FF"..renk3.."")
+	guiSetAlpha(wtablo[wsayi].resim, 0.85)
 	--baslıkArka
-	wtablo[wsayi].basarka = guiCreateStaticImage(0,0,g,20, resimOlustur("test",200), false, wtablo[wsayi].resim)
-	renkVer(wtablo[wsayi].basarka,renk3)
+	wtablo[wsayi].basarka = guiCreateStaticImage(0,0,g,20, resimOlustur("test"), false, wtablo[wsayi].resim)
+	renkVer(wtablo[wsayi].basarka,renk2)
 	--kenarlar
 	wtablo[wsayi].kenarlar = {
 		ordaUst = guiCreateStaticImage(0,0,g,1,resimOlustur("test"), false, wtablo[wsayi].resim),
@@ -92,18 +73,26 @@ function guiCreateWindow(x,y,g,u,yazi,relative,parent,renk1,renk2,renk3,renk4,ka
 	
 	for i,v in pairs(wtablo[wsayi].kenarlar) do
 		renkVer(v,renk4)
-		--guiSetProperty(v, "AlwaysOnTop", "True")
-		guiSetAlpha(v, 1)
+		guiSetProperty(v, "AlwaysOnTop", "True")
+		guiSetAlpha(v, 0.4)
 	end	
 	--baslıkLabel
 	wtablo[wsayi].label = guiCreateLabel((g/2)-((string.len(yazi)*8)/2),0,(string.len(yazi)*8),20, yazi, false, wtablo[wsayi].basarka)
 	guiSetFont(wtablo[wsayi].label, "default-bold-small")
 	guiLabelSetHorizontalAlign(wtablo[wsayi].label, "center")
 	guiLabelSetVerticalAlign(wtablo[wsayi].label, "center")
-	guiLabelSetColor(wtablo[wsayi].label,255,255,255)
 	--kapatArka
-	
-	return wtablo[wsayi].resim,wtablo[wsayi].basarka
+	if not kapat then
+		wtablo[wsayi].kapatArka = guiCreateStaticImage(g-25,-1,25,20,resimOlustur("test"),false,wtablo[wsayi].basarka)
+		renkVer(wtablo[wsayi].kapatArka,"E81123")
+		guiSetAlpha(wtablo[wsayi].kapatArka, 0.5)
+		--kapatLabel
+		wtablo[wsayi].kapat = guiCreateLabel(0,-2,25,20, "X", false, wtablo[wsayi].kapatArka)
+		guiSetFont(wtablo[wsayi].kapat, "default-bold-small")
+		guiLabelSetHorizontalAlign(wtablo[wsayi].kapat, "center")
+		guiLabelSetVerticalAlign(wtablo[wsayi].kapat, "center")
+	end	
+	return wtablo[wsayi].resim
 end
 
 _guiCreateButton = guiCreateButton
@@ -113,10 +102,10 @@ function guiCreateButton(x,y,g,u,yazi,relative,parent,renk1,renk2)
 	
 	if not renk1 or string.len(renk1) > 6 then
 		--renk = math.random(999999)
-		renk1 = "000000" -- genel buton rengi
+		renk1 = "1f1b1a"
 	end
 	if not renk2 or string.len(renk2) > 6 then
-		renk2 = "000000" -- buton kenar rengi
+		renk2 = "000000"
 	end
 	--arkaResim
 	if relative  then
@@ -124,7 +113,7 @@ function guiCreateButton(x,y,g,u,yazi,relative,parent,renk1,renk2)
 		x,y,g,u = x*px,y*pu,g*px,u*pu
 		relative = false
 	end
-	btablo[bsayi].resim = guiCreateStaticImage(x,y,g,u,resimOlustur("test",140),relative,parent)
+	btablo[bsayi].resim = guiCreateStaticImage(x,y,g,u,resimOlustur("test"),relative,parent)
 	renkVer(btablo[bsayi].resim,renk1)
 	--kenarlar
 	btablo[bsayi].kenarlar = {
@@ -139,20 +128,89 @@ function guiCreateButton(x,y,g,u,yazi,relative,parent,renk1,renk2)
 		guiSetAlpha(v, 0.4)
 	end	
 	--label
-	btablo[bsayi].label = guiCreateLabel(0,-2,g,u,yazi,relative,btablo[bsayi].resim)
+	btablo[bsayi].label = guiCreateLabel(0,0,g,u,yazi,relative,btablo[bsayi].resim)
 	guiLabelSetHorizontalAlign(btablo[bsayi].label, "center")
 	guiLabelSetVerticalAlign(btablo[bsayi].label, "center")
-	guiSetFont(btablo[bsayi].label, font1)
+	guiSetFont(btablo[bsayi].label, "default-bold-small")
 	
-	--genelGuiTablo[btablo[bsayi].label] = btablo[bsayi].kenarlar
+	genelGuiTablo[btablo[bsayi].label] = btablo[bsayi].kenarlar
 	return btablo[bsayi].label 
+end
+
+_guiCreateGridList = guiCreateGridList
+function guiCreateGridList(x,y,g,u,relative,parent,kenarrenk)
+	Ssayi = #Ltablo +1
+	
+	if not kenarrenk or string.len(kenarrenk) > 6 then
+		kenarrenk =  "000000"
+	end
+	
+	if not Ltablo[Ssayi] then Ltablo[Ssayi] = {} end
+	
+	if relative  then
+		px,pu = guiGetSize(parent,false)
+		x,y,g,u = x*px,y*pu,g*px,u*pu
+	end
+	local relative = false
+	
+	Ltablo[Ssayi].resim = guiCreateStaticImage(x,y,g,u, resimOlustur("test"), relative, parent)
+	renkVer(Ltablo[Ssayi].resim,kenarrenk)
+	Ltablo[Ssayi].liste = _guiCreateGridList(-8,-10,g+20, u+18,false, Ltablo[Ssayi].resim)
+	
+	Ltablo[Ssayi].kenarlar = {
+	ortaUst = guiCreateStaticImage(0,0,g,1,resimOlustur("test"), false, Ltablo[Ssayi].resim),
+	ortaAlt = guiCreateStaticImage(0,u-1,g,1,resimOlustur("test"), false, Ltablo[Ssayi].resim),
+	sol = guiCreateStaticImage(0,0,1,u,resimOlustur("test"), false, Ltablo[Ssayi].resim),
+	sag = guiCreateStaticImage(g-1,0,1,u,resimOlustur("test"), false, Ltablo[Ssayi].resim)}
+	genelGuiTablo[Ltablo[Ssayi].liste] = Ltablo[Ssayi].kenarlar
+	
+	for i,v in pairs(Ltablo[Ssayi].kenarlar) do
+		renkVer(v,kenarrenk)
+		guiSetProperty(v, "AlwaysOnTop", "True")
+		guiSetAlpha(v, 0.4)
+	end	
+	return Ltablo[Ssayi].liste
+end
+
+_guiCreateEdit = guiCreateEdit
+function guiCreateEdit(x,y,g,u,yazi,relative,parent,kenarrenk)
+	esayi = #etablo +1
+	
+	if not kenarrenk or string.len(kenarrenk) > 6 then
+		kenarrenk =  "000000"
+	end
+	
+	if not etablo[esayi] then etablo[esayi] = {} end
+	
+	if relative  then
+		px,pu = guiGetSize(parent,false)
+		x,y,g,u = x*px,y*pu,g*px,u*pu
+	end
+	local relative = false
+
+	etablo[esayi].resim = guiCreateStaticImage(x,y,g,u, resimOlustur("test"), relative, parent)
+	--guiSetAlpha(etablo[esayi].resim, 0)
+	renkVer(etablo[esayi].resim,kenarrenk)
+	etablo[esayi].edit = _guiCreateEdit(-7,-5,g+15, u+8,yazi,false, etablo[esayi].resim)
+	etablo[esayi].kenarlar = {
+	ortaUst = guiCreateStaticImage(0,0,g,1,resimOlustur("test"), false, etablo[esayi].resim),
+	ortaAlt = guiCreateStaticImage(0,u-1,g,1,resimOlustur("test"), false, etablo[esayi].resim),
+	sol = guiCreateStaticImage(0,0,1,u,resimOlustur("test"), false, etablo[esayi].resim),
+	sag = guiCreateStaticImage(g-1,0,1,u,resimOlustur("test"), false, etablo[esayi].resim)}
+	genelGuiTablo[etablo[esayi].edit] = etablo[esayi].kenarlar
+	for i,v in pairs(etablo[esayi].kenarlar) do
+		renkVer(v,kenarrenk)
+		guiSetProperty(v, "AlwaysOnTop", "True")
+		guiSetAlpha(v, 0.4)
+	end	
+	return etablo[esayi].edit
 end
 
 _guiCreateMemo = guiCreateMemo
 function guiCreateMemo(x,y,g,u,yazi,relative,parent,kenarrenk)
 	msayi = #mtablo +1
 	if not kenarrenk or string.len(kenarrenk) > 6 then
-		kenarrenk =  "0064ff"
+		kenarrenk =  "000000"
 	end
 	
 	if not mtablo[msayi] then mtablo[msayi] = {} end
@@ -163,7 +221,7 @@ function guiCreateMemo(x,y,g,u,yazi,relative,parent,kenarrenk)
 	end
 	local relative = false
 	
-	mtablo[msayi].resim = guiCreateLabel(x,y,g,u, "", relative, parent)
+	mtablo[msayi].resim = guiCreateStaticImage(x,y,g,u, resimOlustur("test"), relative, parent)
 	renkVer(mtablo[msayi].resim,kenarrenk)
 	mtablo[msayi].memo = _guiCreateMemo(-5,-10,g+15, u+10, yazi,false, mtablo[msayi].resim)
 	
@@ -180,6 +238,53 @@ function guiCreateMemo(x,y,g,u,yazi,relative,parent,kenarrenk)
 	end	
 	
 	return mtablo[msayi].memo
+end
+
+function guiCreateScrollBar(x,y,g,u,horizontal,relative,parent,kenarrenk)	
+	sbsayi = #sbtablo +1
+	if not kenarrenk or string.len(kenarrenk) > 6 then
+		kenarrenk =  "000000"
+	end
+	
+	if not sbtablo[sbsayi] then sbtablo[sbsayi] = {} end
+	
+	if relative  then
+		px,pu = guiGetSize(parent,false)
+		x,y,g,u = x*px,y*pu,g*px,u*pu
+	end
+	local relative = false
+	
+	sbtablo[sbsayi].resim = guiCreateStaticImage(x,y,g,u, resimOlustur("test"), relative, parent)
+	renkVer(sbtablo[sbsayi].resim,"000000")
+	sbtablo[sbsayi].kutu = guiCreateStaticImage(2,2,5,u-4, resimOlustur("test"),false, sbtablo[sbsayi].resim)
+	
+	sbtablo[sbsayi].kenarlar = {
+	ortaUst = guiCreateStaticImage(0,0,g,1,resimOlustur("test"), false, sbtablo[sbsayi].resim),
+	ortaAlt = guiCreateStaticImage(0,u-1,g,1,resimOlustur("test"), false, sbtablo[sbsayi].resim),
+	sol = guiCreateStaticImage(0,0,1,u,resimOlustur("test"), false, sbtablo[sbsayi].resim),
+	sag = guiCreateStaticImage(g-1,0,1,u,resimOlustur("test"), false, sbtablo[sbsayi].resim)}
+	genelGuiTablo[sbtablo[sbsayi].resim] = sbtablo[sbsayi].kenarlar
+	genelGuiTablo[sbtablo[sbsayi].kutu] = sbtablo[sbsayi].kenarlar
+	for i,v in pairs(sbtablo[sbsayi].kenarlar) do
+		renkVer(v,kenarrenk)
+		guiSetProperty(v, "AlwaysOnTop", "True")
+		guiSetAlpha(v, 0.4)
+	end	
+	
+	return sbtablo[sbsayi].kutu
+end
+
+function guiScrollBarGetScrollPosition(scroll)
+	local parent = getElementParent(scroll)
+	local w = guiGetSize(parent,false)
+	local x = guiGetPosition(scroll,false)
+	return ((x-2)/(w-7))*100
+end
+
+function guiScrollBarSetScrollPosition(scroll,amount)
+	local parent = getElementParent(scroll)
+	local w = guiGetSize(parent,false)
+	guiSetPosition(scroll,(amount/100)*(w-9)+2,2,false)
 end
 
 --edit,gridlst,buton,memo mouse
@@ -225,9 +330,9 @@ end)
 addEventHandler("onClientGUIClick", resourceRoot, function()
 	for i,v in pairs(wtablo) do
 		if source == v.kapat then
+			guiSetInputEnabled(false)
 			guiSetVisible(v.resim, false)
 			showCursor(false)
-		--	esyaGosterme()
 		end
 	end	
 end)
@@ -244,15 +349,6 @@ end
 function penceremi(resim)
 	for i,v in pairs(wtablo) do
 		if v.resim == resim then
-			return i
-		end	
-	end
-	return false	
-end
-
-function memomu(memo)
-	for i,v in pairs(mtablo) do
-		if v.memo == memo then
 			return i
 		end	
 	end
@@ -277,8 +373,14 @@ function baslikmi(element)
 	return false	
 end
 
-
-
+function kutumu(element)
+	for i,v in pairs(sbtablo) do
+		if v.kutu == element then
+			return i
+		end	
+	end
+	return false	
+end
 
 --basinca olan ufalma
 basili = {}
@@ -377,6 +479,31 @@ addEventHandler( "onClientCursorMove", getRootElement( ),function ( _, _, x, y )
 	end
 end)
 
+--scrollbar taşıma
+addEventHandler( "onClientGUIMouseDown", resourceRoot,function ( btn, x, y )
+	if btn == "left" and kutumu(source) then
+		clickedElementSB = source
+		local elementPos = { guiGetPosition( source, false ) }
+		local parent = getElementParent(source)
+		local w = guiGetSize(parent,false)
+		offsetPosSB = { elementPos[ 1 ], elementPos[ 2 ], x, w };
+	end
+end)
+
+addEventHandler( "onClientClick", root,function ( btn, state )
+	if btn == "left" and clickedElementSB and state == "up" then
+		clickedElementSB = nil
+	end
+end)
+
+addEventHandler( "onClientCursorMove", getRootElement( ),function ( _, _, x, y )
+	if clickedElementSB then
+		local farkx = x-offsetPosSB[3]
+		local x,y = farkx + offsetPosSB[ 1 ], offsetPosSB[ 2 ]
+		guiSetPosition( clickedElementSB, (x<2 and 2) or (x>(offsetPosSB[4]-7) and offsetPosSB[4]-7) or x, y, false )
+		triggerEvent("onClientGUIScroll",clickedElementSB,clickedElementSB)
+	end
+end)
 
 --diğer funclar
 _guiGetPosition = guiGetPosition
@@ -420,13 +547,13 @@ function guiSetSize(element,g,u,relative)
 		_guiSetSize(btablo[sira].resim, g,u, false)
 		_guiSetSize(btablo[sira].label, g,u, false)
 		--sağ kenar çizgi
-		--_guiSetPosition(btablo[sira].kenarlar.sag, g-1, 0, false)
-		--_guiSetSize(btablo[sira].kenarlar.sag, 1,u, false)
+		_guiSetPosition(btablo[sira].kenarlar.sag, g-1, 0, false)
+		_guiSetSize(btablo[sira].kenarlar.sag, 1,u, false)
 		--alt kenar çizgi
-		--_guiSetPosition(btablo[sira].kenarlar.ortaAlt, 0, u-1, false)
-		--_guiSetSize(btablo[sira].kenarlar.ortaAlt, g,1, false)
-	elseif penceremi(element) then
-		local sira = penceremi(element)
+		_guiSetPosition(btablo[sira].kenarlar.ortaAlt, 0, u-1, false)
+		_guiSetSize(btablo[sira].kenarlar.ortaAlt, g,1, false)
+	elseif penceremi(source) then
+		local sira = penceremi(source)
 		_guiSetSize(wtablo[sira].resim, g,u, false)
 		--sağ kenar çizgi
 		_guiSetPosition(wtablo[sira].kenarlar.sag, g-1, 0, false)
@@ -437,17 +564,13 @@ function guiSetSize(element,g,u,relative)
 		--baslik
 		_guiSetSize(wtablo[sira].basarka, g,20, false)
 		--kapat
-		if wtablo[sira].kapatArka then
-			_guiSetPosition(wtablo[sira].kapatArka, g-25,1, false)
-		end	
+		_guiSetPosition(wtablo[sira].kapatArka, g-25,1, false)
 		--label
 		local yazi = guiGetText(wtablo[sira].label)
 		_guiSetPosition(wtablo[sira].label, (g/2)-((string.len(yazi)*8)/2),0, false)
 		_guiSetSize(wtablo[sira].label,(string.len(yazi)*8),20, false)
 		guiLabelSetHorizontalAlign(wtablo[sira].label, "center")
 		guiLabelSetVerticalAlign(wtablo[sira].label, "center")
-	else
-		_guiSetSize(element,g,u,relative)
 	end	
 end		
 
@@ -460,11 +583,9 @@ function guiSetText(element, yazi)
 		guiSetSize(wtablo[sira].label, (string.len(yazi)*8),20, false)
 		guiLabelSetHorizontalAlign(wtablo[sira].label, "center")
 		guiLabelSetVerticalAlign(wtablo[sira].label, "center")
-		--_guiSetText(wtablo[sira].label, yazi)
+		_guiSetText(wtablo[sira].label, yazi)
 	else
-		if isElement(element) then
-			_guiSetText(element, yazi)
-		end
+		_guiSetText(element, yazi)
 	end
 end
 
@@ -491,38 +612,9 @@ function guiSetEnabled(element, bool)
 			_guiSetEnabled(element, bool)
 		end
 	else
-		if isElement(element) then
-			_guiSetEnabled(element, bool)
-		end
+		_guiSetEnabled(element, bool)
 	end	
 end
-
-_guiSetVisible = guiSetVisible
-function guiSetVisible(element, bool)
-	if butonmu(element) then
-		local sira = butonmu(element)
-		_guiSetVisible(btablo[sira].resim, bool)
-	else
-		_guiSetVisible(element, bool)
-	end	
-end
-
-_destroyElement = destroyElement
-function destroyElement(element)
-	if butonmu(element) then
-		local sira = butonmu(element)
-		_destroyElement(btablo[sira].resim)	
-		btablo[sira] = nil
-	elseif memomu(element) then
-		local sira = memomu(element)
-		_destroyElement(mtablo[sira].resim)
-		mtablo[sira] = nil		
-	else
-		if isElement(element) then
-			_destroyElement(element)
-		end
-	end	
-end	
 
 _guiWindowSetSizable = guiWindowSetSizable
 function guiWindowSetSizable(element, bool)
@@ -532,45 +624,6 @@ function guiWindowSetSizable(element, bool)
 		_guiWindowSetSizable(element, bool)
 	end	
 end
-
-genelGuiTablo2 = {}
-
-_guiCreateGridList = guiCreateGridList
-
-function guiCreateGridList(x,y,g,u,relative,parent,kenarrenk)
-	Ssayi = #Ltablo +1
-	
-	if not kenarrenk or string.len(kenarrenk) > 6 then
-		kenarrenk =  "000000" -- gridlist kenar renk // gridlist outline color
-	end
-	
-	if not Ltablo[Ssayi] then Ltablo[Ssayi] = {} end
-	
-	if relative  then
-		px,pu = guiGetSize(parent,false)
-		x,y,g,u = x*px,y*pu,g*px,u*pu
-	end
-	local relative = false
-	
-	Ltablo[Ssayi].resim = guiCreateLabel(x,y,g,u, "", relative, parent)
-	Ltablo[Ssayi].liste = _guiCreateGridList(-8,-8,g+10, u+10,false, Ltablo[Ssayi].resim)
-	
-	Ltablo[Ssayi].kenarlar = {
-	ortaUst = guiCreateStaticImage(0,0,g,1,resimOlustur("test"), false, Ltablo[Ssayi].resim),
-	ortaAlt = guiCreateStaticImage(0,u-1,g,1,resimOlustur("test"), false, Ltablo[Ssayi].resim),
-	sol = guiCreateStaticImage(0,0,1,u,resimOlustur("test"), false, Ltablo[Ssayi].resim),
-	sag = guiCreateStaticImage(g-1,0,1,u,resimOlustur("test"), false, Ltablo[Ssayi].resim)}
-	genelGuiTablo2[Ltablo[Ssayi].liste] = Ltablo[Ssayi].kenarlar
-	
-	for i,v in pairs(Ltablo[Ssayi].kenarlar) do
-		renkVer(v,kenarrenk)
-		guiSetProperty(v, "AlwaysOnTop", "True")
-		guiSetAlpha(v, 0.4)
-	end	
-	
-	return Ltablo[Ssayi].liste
-end
-
 -------------------------------------------------
 ------------ EDITED BY Beyonder#0711 ------------
 -------------------------------------------------
