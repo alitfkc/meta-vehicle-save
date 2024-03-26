@@ -4,7 +4,8 @@ gui = {}
 elm_colors = {}
 
 function createLoginPanel()
-    local main = guiCreateWindow(230, 150,350,295,language[language_selection]["window"],false)
+    local gsw,gsh = guiGetScreenSize()
+    local main = guiCreateWindow((gsw-350)/2, (gsh-295)/2,350,295,language[language_selection]["window"],false)
     gui.main = {
         elm = main,
         language_row = "window",
