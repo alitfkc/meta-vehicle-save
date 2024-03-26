@@ -1,6 +1,6 @@
 language = {}
 language["tr"] = {
-    ["window"] = "İsabella Gaming | Araç Kayıt",
+    ["window"] = "Meta Gaming | Araç Kayıt",
     ["getVeh"] = "Aracı Getir",
     ["setVeh"] = "Aracı Kaydet",
     ["veh_name_col"] = "Araç İsmi",
